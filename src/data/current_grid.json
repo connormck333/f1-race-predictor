@@ -1,0 +1,36 @@
+{
+  "current_drivers": [
+    "Max Verstappen",
+    "Lando Norris",
+    "Charles Leclerc",
+    "Oscar Piastri",
+    "Carlos Sainz",
+    "George Russell",
+    "Lewis Hamilton",
+    "Sergio Perez",
+    "Fernando Alonso",
+    "Nico Hulkenburg",
+    "Kevin Magnussen",
+    "Alex Albon",
+    "Franco Colapinto",
+    "Esteban Ocon",
+    "Pierre Gasly",
+    "Zhou Guanyu",
+    "Valtteri Bottas",
+    "Lance Stroll",
+    "Yuki Tsunoda",
+    "Liam Lawson"
+  ],
+  "current_constructors": [
+    "Red Bull",
+    "Ferrari",
+    "McLaren",
+    "Mercedes",
+    "Williams",
+    "Aston Martin",
+    "RB F1 Team",
+    "Haas F1 Team",
+    "Alpine F1 Team",
+    "Sauber"
+  ]
+}
