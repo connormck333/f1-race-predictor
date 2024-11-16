@@ -1,5 +1,5 @@
 # Race Predictor
-**A machine learning project that analyses trends in similar tracks to predict the winner of a certain Grand Prix.**  
+A machine learning project that analyses trends in similar tracks to predict the winner of a certain Grand Prix.
 
 ## How it works
 The aim is to predict the winner of a certain Grand Prix. This predictor will determine this using the following:
