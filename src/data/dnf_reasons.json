@@ -1,0 +1,8 @@
+{
+  "non_mechanical_dnf_reasons": [
+    2, 100, 107, 139
+  ],
+  "driver_dnf_reasons": [
+    3, 4, 20, 33, 41, 130, 137, 138
+  ]
+}
