@@ -13,6 +13,12 @@ class F1Data:
         pd.set_option("display.max_rows", 300)
         self.dir = os.path.dirname(os.path.abspath(__file__))
 
+        # Get current drivers & constructors
+        with open(self.get_file_path("./current_grid.json"), "r") as f:
+            data = json.load(f)
+            self.currentConstructors = data["current_constructors"]
+            self.currentDrivers = data["current_drivers"]
+
         # Download datasets from Kaggle
         self.df = pd.DataFrame()
         path = kagglehub.dataset_download("rohanrao/formula-1-world-championship-1950-2020")
@@ -28,7 +34,7 @@ class F1Data:
         self.generate_main_dataframe()
         self.normalise_constructor_names()
         self.drop_non_current_constructors()
-        self.calculate_constructor_reliability()
+        self.create_reliability_and_crash_rate()
 
 
     def generate_main_dataframe(self):
@@ -78,53 +84,86 @@ class F1Data:
 
 
     def drop_non_current_constructors(self):
-        with open(self.get_file_path("./current_grid.json"), "r") as f:
+        self.df = self.df[self.df["constructorName"].isin(self.currentConstructors)]
+
+
+    def create_reliability_and_crash_rate(self):
+        with open(self.get_file_path("dnf_reasons.json"), "r") as f:
             data = json.load(f)
-            self.currentConstructors = data["current_constructors"]
-            self.df = self.df[self.df["constructorName"].isin(self.currentConstructors)]
+            non_mechanical_dnf_reasons = data["driver_dnf_reasons"] + data["non_mechanical_dnf_reasons"]
+            self.calculate_constructor_reliability(non_mechanical_dnf_reasons)
+
+            self.calculate_drivers_crash_rate(data["driver_dnf_reasons"])
 
 
-    def calculate_constructor_reliability(self):
-        with open(self.get_file_path("./driver_dnf_reasons.json"), "r") as f:
-            data = json.load(f)
-            reliability = {}
+    def calculate_drivers_crash_rate(self, dnf_reasons):
+        crash_rate = {}
 
-            self.df["reliability_by_year"] = 1.0
+        self.df["crash_rate_by_year"] = 1.0
 
-            for constructor in self.currentConstructors:
-                ## Get total reliability
-                total_mechanical_dnfs = self.df.loc[
+        for driver in self.currentDrivers:
+            total_driver_dnfs = self.df.loc[
+                (self.df["driverRef"] == driver) &
+                (self.df["position"] == r"\N") &
+                (self.df["statusId"].isin(dnf_reasons))
+            ]["position"].count()
+            total_entries = self.df.loc[self.df["driverRef"] == driver]["position"].count()
+            crash_rate[driver] = 1 - ((total_entries - total_driver_dnfs) / total_entries)
+
+            ## Get season crash rate
+            for year in self.df["year"].unique():
+                year_driver_dnfs = self.df.loc[
+                    (self.df["driverRef"] == driver) &
+                    (self.df["position"] == r"\N") &
+                    (self.df["statusId"].isin(dnf_reasons)) &
+                    (self.df["year"] == year)
+                    ]["position"].count()
+                year_entries = self.df.loc[
+                    (self.df["driverRef"] == driver) &
+                    (self.df["year"] == year)
+                    ]["position"].count()
+
+                self.df.loc[
+                    (self.df["year"] == year) & (self.df["driverRef"] == driver),
+                    "driver_crash_rate_by_year"
+                ] = 1 - ((year_entries - year_driver_dnfs) / year_entries)
+
+        self.df["driver_crash_rate"] = self.df["driverRef"].map(crash_rate)
+
+
+    def calculate_constructor_reliability(self, dnf_reasons):
+        reliability = {}
+
+        self.df["reliability_by_year"] = 1.0
+
+        for constructor in self.currentConstructors:
+            ## Get total reliability
+            total_mechanical_dnfs = self.df.loc[
+                (self.df["constructorName"] == constructor) &
+                (self.df["position"] == r"\N") &
+                (~self.df["statusId"].isin(dnf_reasons))
+                ]["position"].count()
+            total_entries = self.df.loc[self.df["constructorName"] == constructor]["position"].count()
+            reliability[constructor] = (total_entries - total_mechanical_dnfs) / total_entries
+
+            ## Get season reliability
+            for year in self.df["year"].unique():
+                year_mechanical_dnfs = self.df.loc[
                     (self.df["constructorName"] == constructor) &
                     (self.df["position"] == r"\N") &
-                    (~self.df["statusId"].isin(data["driver_dnf_reasons"]))
-                ]["position"].count()
-                total_entries = self.df.loc[self.df["constructorName"] == constructor]["position"].count()
-                reliability[constructor] = (total_entries - total_mechanical_dnfs) / total_entries
-
-                ## Get season reliability
-                for year in self.df["year"].unique():
-                    year_mechanical_dnfs = self.df.loc[
-                        (self.df["constructorName"] == constructor) &
-                        (self.df["position"] == r"\N") &
-                        (~self.df["statusId"].isin(data["driver_dnf_reasons"])) &
-                        (self.df["year"] == year)
+                    (~self.df["statusId"].isin(dnf_reasons)) &
+                    (self.df["year"] == year)
                     ]["position"].count()
-                    year_entries = self.df.loc[
-                        (self.df["constructorName"] == constructor) &
-                        (self.df["year"] == year)
+                year_entries = self.df.loc[
+                    (self.df["constructorName"] == constructor) &
+                    (self.df["year"] == year)
                     ]["position"].count()
-                    self.df.loc[
-                        (self.df["year"] == year) & (self.df["constructorName"] == constructor),
-                        "reliability_by_year"] = (year_entries - year_mechanical_dnfs) / year_entries
+                self.df.loc[
+                    (self.df["year"] == year) & (self.df["constructorName"] == constructor),
+                    "reliability_by_year"
+                ] = (year_entries - year_mechanical_dnfs) / year_entries
 
-                    if constructor == "Williams" and year == 2014:
-                        print(year_entries)
-                        print(year_mechanical_dnfs)
-
-
-            self.df["reliability"] = self.df["constructorName"].map(reliability)
-
-            print(self.df[["reliability_by_year", "constructorName", "year"]].head(300))
+        self.df["reliability"] = self.df["constructorName"].map(reliability)
 
 
     def get_file_path(self, file_name):
