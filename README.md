@@ -33,3 +33,28 @@ Again, it is important to decipher whether the DNF was a driver's fault.
 I did the opposite of calculating the reliability and only included DNFs that were reported as a driver's fault.
 This only includes crashes and damage related DNFs.
 As with reliability, I also calculated each driver's crash rate by season for better accuracy and relevancy.
+
+## Constructor Current Form
+It is important to know the current form for a constructor when attempting to how they will do in the next race.
+To calculate the current form, the positions from the previous 6 races are taken and applied to the following points system:
+- DNF = 0 points
+- P20 = 1 point
+- P19 = 2 points
+- P18 = 3 points
+- P17 = 4 points
+- P16 = 5 points
+- P15 = 6 points
+- P14 = 7 points
+- P13 = 8 points
+- P12 = 9 points
+- P11 = 10 points
+- P10 = 11 points
+- P9  = 12 points
+- P8  = 13 points
+- P7  = 14 points
+- P6  = 15 points
+- P5  = 16 points
+- P4  = 17 points
+- P3  = 18 points
+- P2  = 19 points
+- P1  = 20 points
