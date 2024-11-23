@@ -34,7 +34,7 @@ I did the opposite of calculating the reliability and only included DNFs that we
 This only includes crashes and damage related DNFs.
 As with reliability, I also calculated each driver's crash rate by season for better accuracy and relevancy.
 
-## Constructor Current Form
+## Constructor & Drivers Current Form
 It is important to know the current form for a constructor when attempting to how they will do in the next race.
 To calculate the current form, the positions from the previous 6 races are taken and applied to the following points system:
 - DNF = 0 points
@@ -58,3 +58,15 @@ To calculate the current form, the positions from the previous 6 races are taken
 - P3  = 18 points
 - P2  = 19 points
 - P1  = 20 points
+
+Current form is calculated using the points system above and taken the average over the past 6 races.
+This provides an accurate representation of how a driver or constructor is performing coming into the next race.
+
+## Track similarities
+Finding trends in performances between constructors and tracks will be beneficial in predicting more accurate results.
+For each race at each track, the constructors are scored using the points system above.
+They are then scored on how many positions higher or lower they finished compared to their position in the standings.
+
+Trends can then be identified between the tracks based on these performances.
+For example, if the same constructors that scored a high result in Monaco also scored a high result in Hungary,
+we could assume that the winners of Monaco next season would have a high chance of winning Hungary too.

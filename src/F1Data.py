@@ -14,6 +14,7 @@ class F1Data:
 
     def __init__(self):
         pd.set_option("display.max_rows", 300)
+        pd.set_option("display.max_columns", 10)
         self.dir = os.path.dirname(os.path.abspath(__file__))
 
         # Get current drivers & constructors
@@ -33,6 +34,8 @@ class F1Data:
         self.results = pd.read_csv(path + "/results.csv")
         self.drivers = pd.read_csv(path + "/drivers.csv")
         self.constructors = pd.read_csv(path + "/constructors.csv")
+        self.constructor_standings = pd.read_csv(path + "/constructor_standings.csv")
+        self.driver_standings = pd.read_csv(path + "/driver_standings.csv")
 
         self.generate_main_dataframe()
         self.normalise_constructor_names()
@@ -43,21 +46,34 @@ class F1Data:
 
     def generate_main_dataframe(self):
         df1 = pd.merge(self.races, self.results, how="inner", on=["raceId"])
-        df2 = pd.merge(df1, self.drivers, how="inner", on=["driverId"])
-        df3 = pd.merge(df2, self.constructors, how="inner", on=["constructorId"])
-        df4 = pd.merge(df3, self.circuits, how="inner", on=["circuitId"], suffixes=("_x1", "_y1"))
+        df1 = pd.merge(df1, self.drivers, how="inner", on=["driverId"], suffixes=("", "_drivers"))
+        df1 = pd.merge(df1, self.constructors, how="inner", on=["constructorId"], suffixes=("", "_constructors"))
+        df1 = pd.merge(df1, self.circuits, how="inner", on=["circuitId"], suffixes=("", "_circuits"))
+        df1 = pd.merge(df1, self.constructor_standings, how="inner", on=["raceId", "constructorId"], suffixes=("", "_constructorStandings"))
+        df1 = pd.merge(df1, self.driver_standings, how="inner", on=["raceId", "driverId"], suffixes=("", "_driverStandings"))
 
-        df4.drop(["time_x", "url_x", "fp1_date", "fp2_date", "fp3_date", "quali_date", "sprint_date", "url_y", "url_x1",
-                  "location", "lat", "lng", "alt", "url_y1", "date", "number_x", "milliseconds", "number_y"], axis=1, inplace=True)
+        df1.drop(["date", "time_x", "url", "fp1_date", "fp1_time", "fp2_date", "fp2_time", "fp3_date", "fp3_time",
+                  "quali_date", "quali_time", "sprint_date", "sprint_time", "resultId", "number", "positionText",
+                  "positionOrder", "laps", "time_y", "milliseconds", "fastestLap", "fastestLapTime", "fastestLapSpeed",
+                  "number_drivers", "code", "dob", "url_drivers", "url_constructors", "location", "lat", "lng", "alt",
+                  "url_circuits", "constructorStandingsId", "positionText_constructorStandings", "wins", "driverStandingsId",
+                  "positionText_driverStandings", "wins_driverStandings"], axis=1, inplace=True)
 
-        df = df4.rename(columns={
-            'name_x': 'circuitName',
-            'code': 'driverCode',
+        print(df1.columns.unique())
+
+        df = df1.rename(columns={
+            'points_constructorStandings': 'constructorStandingsPoints',
+            'points_driverStandings': 'driverStandingsPoints',
+            'name_constructors': 'constructorName',
+            'name_circuits': 'circuitName',
+            'name': 'driverName',
             'country': 'circuitCountry',
-            'name_y': 'constructorName',
-            'name': 'circuitName',
-            'nationality_y': 'constructorNationality',
-            'nationality_x': 'driverNationality'
+            'nationality_constructors': 'constructorNationality',
+            'nationality': 'driverNationality',
+            'position_constructorStandings': 'constructorStandingsPosition',
+            'position_driverStandings': 'driverStandingsPosition',
+            'points_y': 'constructorStandingsPoints',
+            'points_x': 'driversRacePoints'
         })
 
         self.df = df[df["year"] >= self.dataAfterYear]
@@ -176,8 +192,6 @@ class F1Data:
 
         self.calculate_drivers_form()
         self.calculate_constructor_form()
-
-        print(self.df[["constructor_form", "driver_form", "driverRef", "constructorName"]].head(300))
 
 
     def calculate_drivers_form(self):
