@@ -2,9 +2,9 @@ import json
 
 import kagglehub
 import pandas as pd
-import os
 
-from src.PointsUtils import get_points_by_position
+from src.utils.utils import get_file_path
+from src.utils.utils import get_points_by_position
 
 
 class F1Data:
@@ -15,10 +15,9 @@ class F1Data:
     def __init__(self):
         pd.set_option("display.max_rows", 300)
         pd.set_option("display.max_columns", 10)
-        self.dir = os.path.dirname(os.path.abspath(__file__))
 
         # Get current drivers & constructors
-        with open(self.get_file_path("data/current_grid.json"), "r") as f:
+        with open(get_file_path("data/current_grid.json"), "r") as f:
             data = json.load(f)
             self.currentConstructors = data["current_constructors"]
             self.currentDrivers = data["current_drivers"]
@@ -108,7 +107,7 @@ class F1Data:
 
 
     def create_reliability_and_crash_rate(self):
-        with open(self.get_file_path("data/dnf_reasons.json"), "r") as f:
+        with open(get_file_path("data/dnf_reasons.json"), "r") as f:
             data = json.load(f)
             non_mechanical_dnf_reasons = data["driver_dnf_reasons"] + data["non_mechanical_dnf_reasons"]
             self.calculate_constructor_reliability(non_mechanical_dnf_reasons)
@@ -218,7 +217,3 @@ class F1Data:
         self.df["constructor_form"] = constructor_form
 
         self.df.drop(["form_id"], inplace=True, axis=1)
-
-
-    def get_file_path(self, file_name):
-        return os.path.join(self.dir, file_name)
