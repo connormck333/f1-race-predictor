@@ -1,5 +1,6 @@
 from src.F1Data import F1Data
 from src.LinearRegressionModel import LinearRegressionModel
+from src.RaceData import RaceData
 from src.RaceSelector import RaceSelector
 from src.TrackTrends import TrackTrends
 
@@ -11,3 +12,4 @@ if __name__ == '__main__':
 
     # Get race to predict
     predict_data = RaceSelector(f1_data.circuits).get_race()
+    race_data = RaceData(track_trends.df, predict_data)
