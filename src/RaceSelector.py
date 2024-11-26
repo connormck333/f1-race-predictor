@@ -1,7 +1,5 @@
 import json
 
-import pandas as pd
-
 from src.utils.utils import get_file_path
 
 
@@ -59,7 +57,7 @@ class RaceSelector:
         circuit = self.circuits_df.loc[
             (self.circuits_df["circuitRef"] == track_ref)
         ]
-        return circuit["circuitId"]
+        return circuit["circuitId"].values[0]
 
 
     def get_race(self):
@@ -72,4 +70,4 @@ class RaceSelector:
             "circuitId": self.get_circuit_id(track_ref)
         }
 
-        return pd.DataFrame(data)
+        return data
