@@ -12,7 +12,11 @@ class LinearRegressionModel:
 
     def __init__(self, df):
         self.model = LinearRegression()
+        self.scaler = MinMaxScaler(feature_range=(1, 10))
+        self.label_encoder = LabelEncoder()
+
         self.df = df
+        self.rounds = self.df[["year", "round", "circuitRef", "driverRef", "constructorRef"]]
 
         self.X = pd.DataFrame()
         self.prepare_X()
@@ -25,28 +29,31 @@ class LinearRegressionModel:
 
 
     def prepare_X(self):
-        label_encoder = LabelEncoder()
-        self.df["circuitId_encoded"] = label_encoder.fit_transform(self.df["circuitId"])
+        self.df["circuitId_encoded"] = self.label_encoder.fit_transform(self.df["circuitId"])
         self.X = self.df[[
             "constructor_form",
-            "driver_form",
+            "driver_form_avg",
             "track_constructor_position_relative",
-            "track_driver_position_relative",
+            "track_driver_position_relative_avg",
             "circuitId_encoded"
         ]]
         self.X = self.X.fillna(0)
 
 
     def normalize_fields(self):
-        scaler = MinMaxScaler()
-        normalized_data = scaler.fit_transform(self.X)
+        normalized_data = self.scaler.fit_transform(self.X)
         self.X = pd.DataFrame(normalized_data, columns=self.X.columns)
-        print(normalized_data)
+        print(self.X[[
+            "constructor_form",
+            "driver_form_avg",
+            "track_constructor_position_relative",
+            "track_driver_position_relative_avg",
+            "circuitId_encoded"
+        ]])
 
 
     def train_model(self):
-        rounds = self.df[["year", "round", "circuitRef", "driverRef", "constructorRef"]]
-        X_train, X_test, Y_train, Y_test, rounds_train, rounds_test = train_test_split(self.X, self.Y, rounds, test_size=0.2, random_state=42)
+        X_train, X_test, Y_train, Y_test, rounds_train, rounds_test = train_test_split(self.X, self.Y, self.rounds, test_size=0.2, random_state=42)
 
         self.model.fit(X_train, Y_train)
         joblib.dump(self.model, get_file_path("./models/race_prediction_model.pkl"))
@@ -56,7 +63,7 @@ class LinearRegressionModel:
         results["Actual"] = Y_test
         results["Predicted"] = Y_pred
         print(results.loc[
-                (results["year"] == 2024),
+                (results["year"] == 2024) & (results["circuitRef"] == "jeddah"),
                 ["year", "circuitRef", "constructorRef", "Actual", "Predicted"]
               ])
 
