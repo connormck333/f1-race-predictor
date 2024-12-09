@@ -12,6 +12,7 @@ class TrackTrends:
         self.calculate_track_points("driverRef", "track_driver_points")
         self.assign_track_position("track_driver_points", "track_driver_position")
         self.calculate_positions_against_standings("driverStandingsPosition", "track_driver_position", "track_driver_position_relative")
+        self.calculate_mean_driver_relative_by_team()
 
 
     def calculate_track_points(self, existing_column_name, new_column_name):
@@ -37,3 +38,13 @@ class TrackTrends:
             lambda row: row[standings_column_name] - row[track_position_column_name],
             axis=1
         )
+
+
+    def calculate_mean_driver_relative_by_team(self):
+        driver_relative_avg = self.df.groupby(["constructorRef", "year", "round"])["track_driver_position_relative"] \
+            .mean() \
+            .reset_index()
+
+        driver_relative_avg.rename(columns={"track_driver_position_relative": "track_driver_position_relative_avg"}, inplace=True)
+
+        self.df = self.df.merge(driver_relative_avg, on=["constructorRef", "year", "round"], how="left")

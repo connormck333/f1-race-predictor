@@ -190,12 +190,13 @@ class F1Data:
 
         self.calculate_drivers_form()
         self.calculate_constructor_form()
+        self.calculate_mean_driver_form_by_team()
 
 
     def calculate_drivers_form(self):
         self.df["driver_form"] = self.df.groupby("driverRef")["position_points"] \
             .rolling(window=6, min_periods=1) \
-            .sum() \
+            .mean() \
             .reset_index(level=0, drop=True)
 
 
@@ -208,7 +209,7 @@ class F1Data:
                 lambda row: group.loc[
                     (group["form_id"] <= row["form_id"]) & (group["form_id"] > row["form_id"] - 6),
                     "driver_form"
-                ].sum(), axis=1
+                ].mean(), axis=1
             )
 
         constructor_form = self.df.groupby("constructorName").apply(calculate_constructor_form_for_group)
@@ -216,3 +217,13 @@ class F1Data:
         self.df["constructor_form"] = constructor_form
 
         self.df.drop(["form_id"], inplace=True, axis=1)
+
+
+    def calculate_mean_driver_form_by_team(self):
+        driver_form_avg = self.df.groupby(["constructorRef", "year", "round"])["driver_form"] \
+            .mean() \
+            .reset_index()
+
+        driver_form_avg.rename(columns={"driver_form": "driver_form_avg"}, inplace=True)
+
+        self.df = self.df.merge(driver_form_avg, on=["constructorRef", "year", "round"], how="left")
