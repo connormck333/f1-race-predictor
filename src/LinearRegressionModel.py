@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler, LabelEncoder
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder, StandardScaler
 
 from src.utils.utils import get_file_path
 
@@ -39,17 +39,13 @@ class LinearRegressionModel:
         ]]
         self.X = self.X.fillna(0)
 
+        self.X["constructor_form"] = self.X["constructor_form"] * 20
+
+
 
     def normalize_fields(self):
         normalized_data = self.scaler.fit_transform(self.X)
         self.X = pd.DataFrame(normalized_data, columns=self.X.columns)
-        print(self.X[[
-            "constructor_form",
-            "driver_form_avg",
-            "track_constructor_position_relative",
-            "track_driver_position_relative_avg",
-            "circuitId_encoded"
-        ]])
 
 
     def train_model(self):
@@ -69,6 +65,8 @@ class LinearRegressionModel:
 
         mse = mean_squared_error(Y_test, Y_pred)
         r2 = r2_score(Y_test, Y_pred)
+        # accuracy = accuracy_score(Y_test, Y_pred)
+        # print("Accuracy:", accuracy)
 
         print("Mean Squared Error:", mse)
         print("R-squared:", r2)
