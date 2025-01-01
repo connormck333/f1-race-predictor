@@ -18,7 +18,9 @@ class RaceData:
             "circuitId",
             "constructorId",
             "constructorRef",
-            "year"
+            "year",
+            "crash_rate_by_year",
+            "reliability_by_year"
         ])
         with open(get_file_path("./data/current_grid.json"), "r") as f:
             data = json.load(f)
@@ -26,20 +28,22 @@ class RaceData:
             self.drivers = data["current_drivers"]
 
         self.create_df()
+        self.df.to_csv(f'./prediction_data.csv', sep='\t')
 
 
     def create_df(self):
         for constructor in self.constructors:
             recent_race_id = self.training_data.loc[self.training_data["constructorName"] == constructor, "raceId"].max()
 
-            constructor_data_recent = self.training_data.loc[
+            data_recent = self.training_data.loc[
                 (self.training_data["constructorName"] == constructor) & (self.training_data["raceId"] == recent_race_id)]
 
-            drivers_data_recent = self.training_data.loc[(self.training_data["constructorName"] == constructor) & (self.training_data["raceId"] == recent_race_id)]
-            driver_form_avg = drivers_data_recent["driver_form_avg"].mean()
+            driver_form_avg = data_recent["driver_form_avg"].mean()
+            crash_rate_avg = data_recent["crash_rate_by_year"].mean()
+            reliability = data_recent["reliability_by_year"]
 
             track_driver_pos_relative_total = 0
-            for _, row in drivers_data_recent.iterrows():
+            for _, row in data_recent.iterrows():
                 avg = (
                     self.training_data.loc[
                         (self.training_data["driverRef"] == row["driverRef"]) &
@@ -48,13 +52,11 @@ class RaceData:
                     .sort_values(by="raceId", ascending=False)
                     .iloc[0]["track_driver_position_relative_avg"]
                 )
-                print(avg)
                 track_driver_pos_relative_total += avg
 
-            track_driver_pos_relative_avg = track_driver_pos_relative_total / len(drivers_data_recent.index)
-            print(track_driver_pos_relative_avg)
+            track_driver_pos_relative_avg = track_driver_pos_relative_total / len(data_recent.index)
 
-            constructor_dict = self.get_constructors_forms(constructor, constructor_data_recent)
+            constructor_dict = self.get_constructors_forms(constructor, data_recent)
 
             self.df.loc[len(self.df)] = [
                 constructor_dict["constructor_form"],
@@ -64,7 +66,9 @@ class RaceData:
                 self.circuit["circuitId"],
                 constructor_dict["constructorId"],
                 constructor_dict["constructorRef"],
-                constructor_data_recent["year"].values[0]
+                data_recent["year"].values[0],
+                crash_rate_avg,
+                reliability.values[0]
             ]
 
 
