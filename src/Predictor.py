@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 
@@ -9,30 +8,28 @@ class Predictor:
         self.results = pd.DataFrame()
 
 
-    def prepare_data(self, race_data, label_encoder, scaler):
+    def prepare_data(self, race_data, label_encoder):
         race_data["circuitId_encoded"] = label_encoder.fit_transform(race_data["circuitId"])
-
-        print(race_data[(race_data["constructorRef"] == "williams")])
 
         prepared_data = race_data[[
             "constructor_form",
             "driver_form_avg",
             "track_constructor_position_relative",
             "track_driver_position_relative_avg",
+            "crash_rate_by_year",
+            "reliability_by_year",
             "circuitId_encoded"
         ]]
 
         prepared_data = prepared_data.fillna(0)
 
-        normalized_data = scaler.fit_transform(prepared_data)
-        normalized_data = pd.DataFrame(normalized_data, columns=prepared_data.columns)
+        normalized_data = pd.DataFrame(prepared_data, columns=prepared_data.columns)
         normalized_data.drop_duplicates(keep="first", inplace=True)
 
         return normalized_data
 
 
     def predict(self, prediction_data, race_data):
-        # probabilities = self.model.predict_proba(prediction_data)
         predictions = self.model.predict(prediction_data)
 
         self.results = race_data.copy()

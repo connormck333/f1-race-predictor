@@ -57,8 +57,6 @@ class F1Data:
                   "url_circuits", "constructorStandingsId", "positionText_constructorStandings", "wins", "driverStandingsId",
                   "positionText_driverStandings", "wins_driverStandings"], axis=1, inplace=True)
 
-        print(df1.columns.unique())
-
         df = df1.rename(columns={
             'points_constructorStandings': 'constructorStandingsPoints',
             'points_driverStandings': 'driverStandingsPoints',
