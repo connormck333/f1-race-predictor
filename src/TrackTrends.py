@@ -7,12 +7,14 @@ class TrackTrends:
         self.calculate_track_points("constructorName", "track_constructor_points")
         self.assign_track_position("track_constructor_points", "track_constructor_position")
         self.calculate_positions_against_standings("constructorStandingsPosition", "track_constructor_position", "track_constructor_position_relative")
+        self.scale_results("track_constructor_position_relative")
 
         # Driver track trends
         self.calculate_track_points("driverRef", "track_driver_points")
         self.assign_track_position("track_driver_points", "track_driver_position")
         self.calculate_positions_against_standings("driverStandingsPosition", "track_driver_position", "track_driver_position_relative")
         self.calculate_mean_driver_relative_by_team()
+        self.scale_results("track_driver_position_relative_avg")
 
 
     def calculate_track_points(self, existing_column_name, new_column_name):
@@ -48,3 +50,10 @@ class TrackTrends:
         driver_relative_avg.rename(columns={"track_driver_position_relative": "track_driver_position_relative_avg"}, inplace=True)
 
         self.df = self.df.merge(driver_relative_avg, on=["constructorRef", "year", "round"], how="left")
+
+
+    def scale_results(self, column_name):
+        min_value = self.df[column_name].min()
+        max_value = self.df[column_name].max()
+
+        self.df[column_name] = 10 * (self.df[column_name] - min_value) / (max_value - min_value)
