@@ -124,7 +124,7 @@ class F1Data:
                 (self.df["statusId"].isin(dnf_reasons))
             ]["position"].count()
             total_entries = self.df.loc[self.df["driverRef"] == driver]["position"].count()
-            crash_rate[driver] = 1 - ((total_entries - total_driver_dnfs) / total_entries)
+            crash_rate[driver] = ((total_entries - total_driver_dnfs) / total_entries) / 100
 
             ## Get season crash rate
             for year in self.df["year"].unique():
