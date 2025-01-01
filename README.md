@@ -26,7 +26,7 @@ Therefore, I calculated the reliability for the year for each constructor, calcu
 ## Driver Crash Rate
 Driver crash rate is calculated similarly to Constructor Reliability:
 ```python
-crash_rate = 1 - ((total_entries - total_driver_fault_dnfs) / total_entries)
+crash_rate = ((total_entries - total_driver_fault_dnfs) / total_entries) / 100
 ```
 
 Again, it is important to decipher whether the DNF was a driver's fault.

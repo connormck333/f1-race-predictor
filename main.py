@@ -19,5 +19,5 @@ if __name__ == '__main__':
 
     # Predict race
     predictor = Predictor(model.model)
-    predict_data = predictor.prepare_data(race_data.df, model.label_encoder, model.scaler)
+    predict_data = predictor.prepare_data(race_data.df, model.label_encoder)
     result = predictor.predict(predict_data, race_data.df)
