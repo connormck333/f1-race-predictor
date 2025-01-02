@@ -6,12 +6,14 @@ from src.RaceSelector import RaceSelector
 from src.TrackTrends import TrackTrends
 from src.Weightings import Weightings
 
+train_new_model = False
+
 if __name__ == '__main__':
     # Create & train model
     f1_data = F1Data()
     track_trends = TrackTrends(f1_data.df)
     weighted_data = Weightings(track_trends.df).apply()
-    model = TrainingModel(weighted_data)
+    model = TrainingModel(weighted_data, train_new_model)
 
     # Get race to predict
     predict_data = RaceSelector(f1_data.circuits).get_race()
