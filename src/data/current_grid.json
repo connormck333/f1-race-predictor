@@ -1,14 +1,14 @@
 {
   "current_drivers": [
     "sainz",
-    "bottas",
+    "antonelli",
     "ocon",
     "max_verstappen",
     "stroll",
     "hamilton",
     "leclerc",
-    "zhou",
-    "ricciardo",
+    "hadjar",
+    "lawson",
     "piastri",
     "alonso",
     "hulkenberg",
@@ -17,9 +17,9 @@
     "albon",
     "russell",
     "tsunoda",
-    "sargeant",
-    "perez",
-    "kevin_magnussen"
+    "bortoleto",
+    "doohan",
+    "bearman"
   ],
   "current_constructors": [
     "Red Bull",
