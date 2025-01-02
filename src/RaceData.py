@@ -28,7 +28,6 @@ class RaceData:
             self.drivers = data["current_drivers"]
 
         self.create_df()
-        self.df.to_csv(f'./prediction_data.csv', sep='\t')
 
 
     def create_df(self):
