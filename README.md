@@ -90,4 +90,4 @@ It has been rather difficult to predict which team will be fastest for each race
 Constructor form plays a large role in these predictions. Crashes and mechanical DNFs do not occur very often as of recently.
 Therefore, higher weightings have been applied to constructor forms and track performances based on historical data to provide the most accurate results.  
 
-I am looking forward to applying this predictive model for 2025 season.
+I am looking forward to applying this predictive model for 2025 season. I will record real world accuracies here.
