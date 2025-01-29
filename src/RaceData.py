@@ -43,14 +43,18 @@ class RaceData:
 
             track_driver_pos_relative_total = 0
             for _, row in data_recent.iterrows():
-                avg = (
-                    self.training_data.loc[
-                        (self.training_data["driverRef"] == row["driverRef"]) &
-                        (self.training_data["circuitId"] == self.circuit["circuitId"])
-                    ]
-                    .sort_values(by="raceId", ascending=False)
-                    .iloc[0]["track_driver_position_relative_avg"]
-                )
+                avg = 0
+                try:
+                    avg = (
+                        self.training_data.loc[
+                            (self.training_data["driverRef"] == row["driverRef"]) &
+                            (self.training_data["circuitId"] == self.circuit["circuitId"])
+                        ]
+                        .sort_values(by="raceId", ascending=False)
+                        .iloc[0]["track_driver_position_relative_avg"]
+                    )
+                except:
+                    pass
                 track_driver_pos_relative_total += avg
 
             track_driver_pos_relative_avg = track_driver_pos_relative_total / len(data_recent.index)
