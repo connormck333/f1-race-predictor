@@ -1,5 +1,7 @@
 # Race Predictor
-A machine learning project that analyses constructor and driver forms and other data to predict the winner of a certain Grand Prix.
+A machine learning project that analyses constructor and driver forms and other data to predict the winner of a certain Grand Prix.  
+
+Race Predictions for the 2025 F1 Season: https://medium.com/@connora.mckenzie/can-ai-predict-the-f1-2025-season-6d629e1e56a4
 
 ## How it works
 The aim is to predict the winner of a certain Grand Prix. This predictor will determine this using the following:
